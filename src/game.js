@@ -19,6 +19,8 @@ export class Game {
 
     // Slingshot stands on the Hollins Cross saddle.
     this.slingPos = new THREE.Vector3(0, data.heightAt(0, 0), 0);
+    this.elevY = 0.45; // ~33 degrees
+
     this.sling = makeSlingshot();
     this.sling.position.copy(this.slingPos);
     scene.add(this.sling);
@@ -74,6 +76,7 @@ export class Game {
     this.pitch = 6;
     this.camMode = 'aim';
     this.state = 'ready';
+    this.snapCam = true;
     this._loadNextBird();
     this.ui.onLevelStart(L, this.camps);
   }
@@ -200,19 +203,28 @@ export class Game {
   startPull() {
     if (!this.canPull()) return false;
     this.targetYaw = this.yaw; // freeze heading while aiming
-    this.state = 'pulling'; this.pull = { x: 0, y: 0, len: 0 }; this.camMode = 'aim';
+    this.state = 'pulling'; this.pull = { x: 0, y: this.elevY, len: 0 }; this.camMode = 'aim';
     return true;
   }
 
-  /** dx, dy in screen pixels from the pull start; scale is pixels for a full pull. */
+  /**
+   * dx, dy in screen pixels from the pull start; scale is pixels for a full pull.
+   * Drag down = power, drag sideways = fine heading. Elevation is set separately
+   * (mouse wheel, W/S keys or the on-screen arc buttons) and shown by the aiming dots.
+   */
   updatePull(dx, dy, scale) {
     if (this.state !== 'pulling') return;
-    let x = -dx / scale, y = dy / scale;
-    const len = Math.hypot(x, y);
-    if (len > 1) { x /= len; y /= len; }
+    const len = Math.min(1, Math.max(0, dy) / scale);
+    const x = THREE.MathUtils.clamp(-dx / scale, -1, 1);
     const prevLen = this.pull.len;
-    this.pull = { x, y, len: Math.min(1, len) };
-    if (Math.floor(this.pull.len * 8) !== Math.floor(prevLen * 8)) sfx.stretch(this.pull.len);
+    this.pull = { x, y: this.elevY, len };
+    if (Math.floor(len * 8) !== Math.floor(prevLen * 8)) sfx.stretch(len);
+  }
+
+  /** Change launch elevation; y in -0.35..1 maps to -8..62 degrees. */
+  adjustElevation(d) {
+    this.elevY = THREE.MathUtils.clamp(this.elevY + d, -0.35, 1);
+    if (this.pull) this.pull.y = this.elevY;
   }
 
   cancelPull() { if (this.state === 'pulling') { this.state = 'ready'; this.pull = null; this.dots.visible = false; } }
@@ -220,6 +232,7 @@ export class Game {
   release() {
     if (this.state !== 'pulling') return false;
     if (this.pull.len < 0.12) { this.cancelPull(); return false; }
+    this.lastPower = this.pull.len;
     const v = this.launchVelocity(this.pull);
     this.pull = null; this.dots.visible = false;
     const rb = this.readyBird; this.readyBird = null;
@@ -472,6 +485,14 @@ export class Game {
     }
     this._updateBands();
     if (this.state === 'pulling' && this.readyBird) this.readyBird.mesh.position.copy(this.pouch);
+    // show the arc while waiting too, at the last power, so the angle controls give feedback
+    if (this.state === 'ready' && this.readyBird) {
+      this.pull = { x: 0, y: this.elevY, len: this.lastPower ?? 0.7 };
+      this._drawDots(0.35);
+      this.pull = null;
+    }
+    const ang = document.getElementById('hud-angle');
+    if (ang) ang.textContent = `${Math.round(THREE.MathUtils.clamp(10 + this.elevY * 52, -8, 62))}°`;
   }
 
   _drawTrail(b) {
@@ -501,7 +522,8 @@ export class Game {
   }
 
   /** Predicted arc, sampled with the same gravity/wind/drag as the flight. */
-  _drawDots() {
+  _drawDots(opacity = 0.9) {
+    this.dots.material.opacity = opacity; this.dots.material.transparent = true;
     const v = this.launchVelocity(this.pull);
     let p = this.pouch.clone(), vel = v.clone();
     const dt = 0.1, m = new THREE.Matrix4(), s = new THREE.Vector3(1, 1, 1), q = new THREE.Quaternion();
@@ -530,6 +552,7 @@ export class Game {
     if (this.camMode === 'scout') {
       const target = this.scoutTarget || head;
       this.camera.position.lerp(tmpV.copy(target).add(new THREE.Vector3(0, 60, 0)), Math.min(1, dt * 2));
+      this._keepAboveGround();
       this.camera.lookAt(target);
       this.env.follow(target);
       return;
@@ -542,6 +565,7 @@ export class Game {
       const side = tmpV2.copy(dir).cross(UP).normalize();
       this.camPos.addScaledVector(side, 3.2);
       this.camera.position.lerp(this.camPos, Math.min(1, dt * (this.followT < 0.35 ? 14 : 3.5)));
+      this._keepAboveGround();
       const lead = b.clone().addScaledVector(tmpV.copy(b).sub(head).normalize(), 22);
       this.camLook.lerp(lead, Math.min(1, dt * 5));
       this.camera.lookAt(this.camLook);
@@ -550,16 +574,26 @@ export class Game {
     }
     // aiming view: just behind the slingshot, looking along the heading
     const f = bearingVector(this.yaw);
-    const back = new THREE.Vector3(-f.x, 0, -f.z).multiplyScalar(3.4);
+    // far enough back to see the fork, the bird and the landscape beyond
+    const back = new THREE.Vector3(-f.x, 0, -f.z).multiplyScalar(9.5);
     const p = head.clone().add(back);
-    p.y = this.slingPos.y + 6.3 + Math.sin(THREE.MathUtils.degToRad(this.pitch)) * 9;
+    p.y = this.slingPos.y + 9.2 + Math.sin(THREE.MathUtils.degToRad(this.pitch)) * 9;
     const fwd = new THREE.Vector3(f.x, 0, f.z);
     const aim = head.clone().addScaledVector(fwd, 85);
-    aim.y = head.y - 6 + Math.tan(THREE.MathUtils.degToRad(this.pitch)) * 85;
+    aim.y = head.y - 12 + Math.tan(THREE.MathUtils.degToRad(this.pitch)) * 85;
+    if (this.snapCam) { this.camera.position.copy(p); this.camLook.copy(aim); this.snapCam = false; }
     this.camera.position.lerp(p, Math.min(1, dt * 6));
     this.camLook.lerp(aim, Math.min(1, dt * 6));
+    this._keepAboveGround();
     this.camera.lookAt(this.camLook);
     this.env.follow(this.slingPos);
+  }
+
+  /** The camera never dips below the real terrain. */
+  _keepAboveGround() {
+    const c = this.camera.position;
+    const g = this.data.heightAt(c.x, c.z) + 1.5;
+    if (c.y < g) c.y = g;
   }
 
   scoutFrom(camp) {

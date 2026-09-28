@@ -66,7 +66,7 @@ export const LEVELS = [
   {
     id: 1, title: 'Ridge Feeder',
     blurb: 'Squirrels have raided a feeder on the Great Ridge, on the way to Mam Tor.',
-    tip: 'Drag the bird back and let go. Pull lower to throw higher.',
+    tip: 'Drag down from the bird to pull, let go to fling. Set the angle with ▲▼ and follow the dots.',
     birds: ['robin', 'robin', 'robin'],
     camps: [{ name: 'Great Ridge West', bearing: 250, dist: 170, build: [['hut', 0, 'wood']] }],
   },

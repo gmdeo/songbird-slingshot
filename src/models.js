@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { BIRDS } from './data.js';
 
-const std = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, ...extra });
+const std = (color, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.75, emissive: color, emissiveIntensity: 0.28, ...extra });
 
 function eye(r) {
   const g = new THREE.Group();

@@ -95,12 +95,13 @@ async function main() {
   canvas.addEventListener('pointerup', endPointer);
   canvas.addEventListener('pointercancel', (e) => { game.cancelPull(); pointer = null; });
 
+  // Pull starts on the bird, or anywhere in the lower 45% of the screen; the sky swivels.
   function inSlingshotZone(px, py) {
     const v = game.pouch.clone().project(camera);
     const sx = (v.x * 0.5 + 0.5) * window.innerWidth;
     const sy = (-v.y * 0.5 + 0.5) * window.innerHeight;
     const r = Math.min(window.innerWidth, window.innerHeight) * 0.22;
-    return Math.hypot(px - sx, py - sy) < r;
+    return Math.hypot(px - sx, py - sy) < r || py > window.innerHeight * 0.55;
   }
 
   // keyboard: arrows swivel, space pulls the last-used strength, 1-5 pick a bird, F fires
@@ -112,7 +113,7 @@ async function main() {
     if (e.key === 'f' || e.key === 'F') {
       if (game.state === 'ready') {
         game.state = 'pulling';
-        game.pull = { x: 0, y: 0.62, len: 0.78 };
+        game.pull = { x: 0, y: game.elevY, len: game.keyPower ?? 0.8 };
         game.release();
       }
     }
@@ -125,9 +126,18 @@ async function main() {
     const s = 55 * dt;
     if (held.has('ArrowLeft') || held.has('a')) game.swivel(-s);
     if (held.has('ArrowRight') || held.has('d')) game.swivel(s);
-    if (held.has('ArrowUp') || held.has('w')) game.swivel(0, s * 0.35);
-    if (held.has('ArrowDown') || held.has('s')) game.swivel(0, -s * 0.35);
+    if (held.has('ArrowUp') || held.has('w')) game.adjustElevation(dt * 0.6);
+    if (held.has('ArrowDown') || held.has('s')) game.adjustElevation(-dt * 0.6);
   }
+
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); game.adjustElevation(-Math.sign(e.deltaY) * 0.05); }, { passive: false });
+  const hold = (id, d) => {
+    const el = document.getElementById(id); let t = null;
+    const stop = () => { clearInterval(t); t = null; };
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); game.adjustElevation(d); t = setInterval(() => game.adjustElevation(d), 60); });
+    el.addEventListener('pointerup', stop); el.addEventListener('pointerleave', stop); el.addEventListener('pointercancel', stop);
+  };
+  hold('btn-up', 0.03); hold('btn-down', -0.03);
 
   // ---------------- buttons
   const on = (id, fn) => document.getElementById(id).addEventListener('click', (e) => { initAudio(); fn(e); });
@@ -209,7 +219,7 @@ async function main() {
       for (const k of Object.keys(BIRDS)) items.push([`[data-bird="${k}"]`, m.makeBird(k), 9]);
       items.push(['[data-squirrel]', m.makeSquirrel(), 9]);
       for (const [sel, obj, dist] of items) {
-        const cv = document.querySelector(sel);
+        const cv = document.querySelector(`canvas${sel}`);
         if (!cv) continue;
         sc.clear();
         sc.add(obj);

@@ -10,7 +10,7 @@ export function createRenderer(canvas) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.55;
+  renderer.toneMappingExposure = 0.85;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   return renderer;
 }
@@ -54,7 +54,7 @@ export function createEnvironment(scene, origin) {
     const warm = THREE.MathUtils.clamp((25 - alt) / 20, 0, 1);
     sun.color.setRGB(1, 0.95 - warm * 0.25, 0.88 - warm * 0.45);
     sun.intensity = 1.6 + (1 - warm) * 1.4;
-    hemi.intensity = 0.55 + (1 - warm) * 0.45;
+    hemi.intensity = 1.1 + (1 - warm) * 0.5;
   };
 
   env.applyWeather = (w) => {
