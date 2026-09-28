@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Songbird Slingshot — Hollins Cross, Peak District</title>
+<meta name="description" content="Swivel around a real 3D Peak District landscape and fling British songbirds at camps of grey squirrels raiding the feeders.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<canvas id="game" aria-label="3D landscape of the Great Ridge in the Peak District. Drag the sky to swivel, drag the bird to aim, tap in flight to use a bird's power."></canvas>
+<div id="loading">Loading real terrain…</div>
+
+<div id="hud" hidden>
+  <div class="hud-row hud-top">
+    <div class="hud-left">
+      <span id="hud-level">—</span>
+      <span id="hud-score">Score 0</span>
+      <span id="hud-weather">—</span>
+    </div>
+    <div class="hud-right">
+      <button type="button" id="btn-restart" aria-label="Restart level" title="Restart level">↻</button>
+      <button type="button" id="btn-sound" aria-label="Sound on" aria-pressed="true" title="Sound">♪</button>
+      <button type="button" id="btn-menu" aria-label="Level menu" title="Levels">☰</button>
+    </div>
+  </div>
+
+  <div id="compass" aria-hidden="true">
+    <div id="compass-strip">
+      <div id="compass-tape"></div>
+      <div id="compass-needle"></div>
+    </div>
+  </div>
+
+  <div class="hud-row hud-bottom">
+    <div class="hud-birds-wrap">
+      <div class="hud-label">Flock</div>
+      <div id="hud-birds"></div>
+    </div>
+    <div class="hud-birdinfo">
+      <div id="hud-birdname">—</div>
+      <div id="hud-power" class="small">—</div>
+    </div>
+  </div>
+  <div id="hud-damage"></div>
+</div>
+
+<div id="pops" aria-hidden="true"></div>
+<div id="tip" class="tipbar" role="status"></div>
+
+<section id="screen-title" class="overlay" aria-labelledby="t-title">
+  <div class="card">
+    <h1 id="t-title">Songbird Slingshot</h1>
+    <p class="lede">You are standing on Hollins Cross, on the Great Ridge in the Peak District.
+      Grey squirrels have raided the feeders all along the ridge. Five real British songbirds are fighting back.</p>
+    <p class="small">The landscape is real: the ground, drystone walls, woods, streams and villages come from
+      survey data. Weather and time of day are live.</p>
+    <div class="row">
+      <button type="button" class="big" id="btn-play">Play</button>
+      <button type="button" id="btn-guide">Field guide</button>
+      <button type="button" id="btn-levels">Levels</button>
+    </div>
+    <p class="small keys">Drag the sky to <b>swivel around</b> · drag the bird to <b>aim and launch</b> ·
+      tap in flight to use a <b>power</b> · arrow keys also swivel</p>
+  </div>
+</section>
+
+<section id="screen-levels" class="overlay hidden" aria-labelledby="l-title">
+  <div class="card">
+    <h2 id="l-title">Levels</h2>
+    <div id="level-grid" class="grid"></div>
+    <button type="button" id="btn-levels-back">Back</button>
+  </div>
+</section>
+
+<section id="screen-guide" class="overlay hidden" aria-labelledby="g-title">
+  <div class="card wide">
+    <h2 id="g-title">Field guide</h2>
+    <div id="guide-list"></div>
+    <div class="row"><button type="button" id="btn-guide-back">Back</button></div>
+  </div>
+</section>
+
+<section id="screen-result" class="overlay hidden" aria-labelledby="r-title">
+  <div class="card">
+    <h2 id="r-title">Level cleared</h2>
+    <div id="r-stars" class="stars" aria-hidden="true"></div>
+    <p id="r-score"></p>
+    <div id="r-fact" class="fact"></div>
+    <div class="row">
+      <button type="button" id="btn-r-retry">Retry</button>
+      <button type="button" id="btn-r-levels">Levels</button>
+      <button type="button" class="big" id="btn-r-next">Next</button>
+    </div>
+  </div>
+</section>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

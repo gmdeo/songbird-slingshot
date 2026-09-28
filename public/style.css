@@ -1,0 +1,154 @@
+:root {
+  --ink: #17241a;
+  --paper: #f7f3e6;
+  --paper-2: #e8e0c9;
+  --leaf: #3d6b36;
+  --leaf-dark: #264d22;
+  --grit: #6f6a5e;
+  --gold: #d9a621;
+  --rob: #c94f26;
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; background: #8fc0dd;
+  font-family: "Trebuchet MS", Georgia, system-ui, sans-serif;
+  color: var(--ink);
+  touch-action: none; -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+canvas#game { display: block; width: 100vw; height: 100vh; height: 100dvh; cursor: grab; }
+canvas#game:active { cursor: grabbing; }
+
+#loading {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  background: #22301f; color: #f7f3e6; font-size: 18px; z-index: 40;
+}
+
+/* ---------------------------------------------------------------- HUD */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 5; display: flex; flex-direction: column; justify-content: space-between; }
+.hud-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 0 12px; }
+.hud-top { padding-top: max(10px, env(safe-area-inset-top)); }
+.hud-bottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); align-items: flex-end; }
+.hud-left { display: flex; gap: 8px; flex-wrap: wrap; }
+.hud-left span {
+  background: rgba(247, 243, 230, 0.9); padding: 6px 12px; border-radius: 999px;
+  font-weight: 700; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.hud-right { display: flex; gap: 8px; pointer-events: auto; }
+
+button {
+  font: inherit; font-weight: 700; font-size: 15px; min-height: 42px; padding: 9px 18px;
+  border: 2px solid var(--leaf-dark); border-radius: 999px;
+  background: var(--paper); color: var(--ink); cursor: pointer;
+}
+button:hover { background: var(--paper-2); }
+button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+button.big { background: var(--leaf); color: #fff; font-size: 18px; padding: 12px 26px; }
+button.big:hover { background: var(--leaf-dark); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.hud-right button { width: 42px; height: 42px; padding: 0; font-size: 18px; border-radius: 50%; }
+
+/* ---------------------------------------------------------------- compass */
+#compass { position: absolute; left: 0; right: 0; top: max(56px, 14vh); display: flex; justify-content: center; }
+#compass-strip {
+  position: relative; width: min(880px, 94vw); height: 30px; overflow: hidden;
+  background: linear-gradient(90deg, rgba(247,243,230,0.06), rgba(247,243,230,0.72) 18%, rgba(247,243,230,0.72) 82%, rgba(247,243,230,0.06));
+  border-radius: 8px; mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+#compass-tape { position: absolute; inset: 0; }
+.tick {
+  position: absolute; top: 50%; transform: translate(-50%, -50%);
+  font-size: 12px; white-space: nowrap; color: #3a4a3c; font-weight: 600;
+}
+.tick.card { font-size: 15px; font-weight: 800; color: var(--leaf-dark); }
+.tick.peak, .tick.plateau, .tick.village, .tick.castle, .tick.pass, .tick.cave_entrance, .tick.hamlet, .tick.reservoir, .tick.mine, .tick.farm { color: #4a5a3c; font-style: italic; font-size: 12.5px; }
+.tick.target { color: #c0392b; font-size: 17px; font-weight: 900; }
+#compass-needle {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--rob);
+  transform: translateX(-50%); box-shadow: 0 0 6px rgba(0,0,0,.3);
+}
+#compass.near #compass-needle { background: #1f8a3a; }
+
+/* ---------------------------------------------------------------- flock + tips */
+.hud-birds-wrap { pointer-events: none; }
+.hud-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: #2f3d30; font-weight: 800; margin-bottom: 4px; text-shadow: 0 1px 3px rgba(255,255,255,.7); }
+#hud-birds { display: flex; gap: 6px; flex-wrap: wrap; }
+.bird-chip {
+  background: rgba(247,243,230,.92); border-radius: 999px; padding: 4px 11px;
+  font-size: 13px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.bird-chip:first-child { background: var(--leaf); color: #fff; }
+.hud-birdinfo { text-align: right; max-width: 40vw; pointer-events: none; }
+#hud-birdname { font-weight: 800; font-size: 17px; text-shadow: 0 1px 4px rgba(255,255,255,.8); }
+.small { font-size: 12.5px; }
+
+#hud-damage {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(150,20,10,.85));
+  transition: opacity .35s;
+}
+
+#pops { position: fixed; inset: 0; pointer-events: none; z-index: 6; }
+.pop {
+  position: absolute; transform: translate(-50%, -50%); color: #fff; font-weight: 900;
+  font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,.6), 0 0 14px rgba(255,210,80,.6);
+  animation: floatup 1.2s ease-out forwards;
+}
+@keyframes floatup { from { opacity: 1; transform: translate(-50%, -50%); } to { opacity: 0; transform: translate(-50%, -190%); } }
+
+.tipbar {
+  position: fixed; left: 50%; bottom: max(96px, 16vh); transform: translateX(-50%);
+  background: rgba(23, 36, 26, .88); color: var(--paper);
+  padding: 9px 16px; border-radius: 12px; font-size: 14.5px; line-height: 1.4;
+  pointer-events: none; opacity: 0; transition: opacity .3s; max-width: min(620px, 92vw); text-align: center; z-index: 6;
+}
+.tipbar.show { opacity: 1; }
+
+/* ---------------------------------------------------------------- overlays */
+.overlay {
+  position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(23, 36, 26, .5); padding: 16px; z-index: 20;
+}
+.overlay.hidden { display: none; }
+.card {
+  background: var(--paper); border: 3px solid var(--leaf-dark); border-radius: var(--radius);
+  padding: 22px 24px; max-width: 520px; width: 100%; max-height: calc(100dvh - 32px);
+  overflow-y: auto; text-align: center; box-shadow: 0 14px 40px rgba(0,0,0,.35);
+}
+.card.wide { max-width: 720px; text-align: left; }
+.card h1 { margin: 0 0 10px; font-size: clamp(26px, 5.6vw, 38px); color: var(--leaf-dark); }
+.card h2 { margin: 0 0 12px; color: var(--leaf-dark); }
+.card p { line-height: 1.45; margin: 8px 0; }
+.lede { font-size: 16.5px; }
+.row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.keys { margin-top: 14px; color: #46584a; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.grid button.lvl { border-radius: 12px; min-height: 82px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px; }
+.grid .lvl-name { font-size: 12px; font-weight: 600; }
+.grid .lvl-stars { color: #b58a00; font-size: 13px; letter-spacing: 1px; }
+
+.guide-item { display: grid; grid-template-columns: 72px 1fr; gap: 14px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--paper-2); }
+.guide-item canvas { width: 72px; height: 72px; background: rgba(0,0,0,.04); border-radius: 10px; }
+.guide-item h3 { margin: 0; font-size: 17.5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.guide-item .latin { font-style: italic; color: #4a5a4c; font-size: 13.5px; }
+.guide-item .power { font-weight: 700; color: var(--leaf); margin: 4px 0; font-size: 15px; }
+.guide-item p { margin: 4px 0; font-size: 14.5px; line-height: 1.45; }
+.status { font-size: 11px; font-weight: 800; padding: 1px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.status.green { background: #cfe8c6; color: #234d1c; }
+.status.amber { background: #f6dfa3; color: #5a4200; }
+.status.invasive { background: #ddd6cb; color: #3d3d3d; }
+
+.stars { font-size: 42px; color: var(--gold); letter-spacing: 6px; min-height: 52px; }
+.stars .off { color: #cdc4ad; }
+.fact { background: var(--paper-2); border-radius: 10px; padding: 10px 14px; font-size: 14.5px; text-align: left; line-height: 1.45; }
+.fact strong { color: var(--leaf-dark); }
+
+@media (max-width: 560px) {
+  .hud-birdinfo { max-width: 46vw; }
+  .tipbar { bottom: max(112px, 20vh); font-size: 13.5px; }
+  #compass { top: max(52px, 12vh); }
+}
+@media (prefers-reduced-motion: reduce) { .pop { animation-duration: .01ms; } }
