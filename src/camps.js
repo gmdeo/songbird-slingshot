@@ -7,8 +7,8 @@ import { makeSquirrel } from './models.js';
 
 // Templates are lists of blocks in camp-local metres: [x, y(base), z, w, h, d, kind]
 // kind: 'post' | 'plank' | 'block' | 'squirrel'. x runs across the line of fire, z away from the player.
-const T = 0.35;
-function frame(x, base, w, h, depth = 3.5) {
+const T = 3.5;
+function frame(x, base, w, h, depth = 6.0) {
   const o = w / 2 - T / 2;
   return [
     [x - o, base, -depth / 2 + T / 2, T, h, T, 'post'], [x + o, base, -depth / 2 + T / 2, T, h, T, 'post'],
@@ -27,20 +27,20 @@ function tower(x, floors, w, h, squirrelOn) {
   return out;
 }
 export const TEMPLATES = {
-  hut: (x) => tower(x, 1, 3.2, 2.4, [0, 1]),
-  tower1: (x) => tower(x, 1, 2.4, 3.0, [1]),
-  tower2: (x) => tower(x, 2, 2.6, 2.4, [0, 2]),
-  tower3: (x) => tower(x, 3, 2.6, 2.2, [1, 3]),
+  hut: (x) => tower(x, 1, 32, 24, [0, 1]),
+  tower1: (x) => tower(x, 1, 24, 30, [1]),
+  tower2: (x) => tower(x, 2, 26, 24, [0, 2]),
+  tower3: (x) => tower(x, 3, 26, 22, [1, 3]),
   wall: (x) => [
-    [x - 1.6, 0, 0, 1.4, 1.1, 1.0, 'block'], [x, 0, 0, 1.4, 1.1, 1.0, 'block'], [x + 1.6, 0, 0, 1.4, 1.1, 1.0, 'block'],
-    [x - 0.8, 1.1, 0, 1.4, 1.0, 1.0, 'block'], [x + 0.8, 1.1, 0, 1.4, 1.0, 1.0, 'block'],
-    [x, 2.1, 0, 0, 0, 0, 'squirrel'],
+    [x - 16, 0, 0, 14, 11, 10, 'block'], [x, 0, 0, 14, 11, 10, 'block'], [x + 16, 0, 0, 14, 11, 10, 'block'],
+    [x - 8, 11, 0, 14, 10, 10, 'block'], [x + 8, 11, 0, 14, 10, 10, 'block'],
+    [x, 21, 0, 0, 0, 0, 'squirrel'],
   ],
   barn: (x) => [
-    ...frame(x, 0, 6, 3.0, 4),
-    [x - 1.5, 3.0 + T, 0, 0, 0, 0, 'squirrel'], [x + 1.5, 3.0 + T, 0, 0, 0, 0, 'squirrel'],
+    ...frame(x, 0, 60, 30, 40),
+    [x - 15, 30 + T, 0, 0, 0, 0, 'squirrel'], [x + 15, 30 + T, 0, 0, 0, 0, 'squirrel'],
     [x, 0, 0, 0, 0, 0, 'squirrel'],
-    [x, 3.0 + T, -1.2, 5.6, 0.45, 0.8, 'roof'], [x, 3.0 + T, 1.2, 5.6, 0.45, 0.8, 'roof'],
+    [x, 30 + T, -12, 56, 4.5, 8, 'roof'], [x, 30 + T, 12, 56, 4.5, 8, 'roof'],
   ],
 };
 

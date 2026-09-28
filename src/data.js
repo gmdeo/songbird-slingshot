@@ -4,31 +4,31 @@
 export const BIRDS = {
   robin: {
     name: 'Robin', latin: 'Erithacus rubecula', status: 'Green',
-    radius: 1.8, mass: 12, colors: { body: 0x8a6a4a, belly: 0xd9542b, face: 0xd9542b, wing: 0x6e5236, beak: 0x2a2018 },
+    radius: 3.5, mass: 18, colors: { body: 0x8a6a4a, belly: 0xd9542b, face: 0xd9542b, wing: 0x6e5236, beak: 0x2a2018 },
     power: 'Steady flyer. No power.', powerKey: null,
     fact: 'Robins sing nearly all year round, even at night beside street lights. Despite the cute look they are fiercely territorial.',
   },
   bluetit: {
     name: 'Blue Tit', latin: 'Cyanistes caeruleus', status: 'Green',
-    radius: 1.5, mass: 10, colors: { body: 0x7aa05a, belly: 0xf2d33a, face: 0xffffff, cap: 0x3a7fd0, wing: 0x3a7fd0, beak: 0x1b1b1b },
+    radius: 3.0, mass: 15, colors: { body: 0x7aa05a, belly: 0xf2d33a, face: 0xffffff, cap: 0x3a7fd0, wing: 0x3a7fd0, beak: 0x1b1b1b },
     power: 'Tap mid-flight: dash forward.', powerKey: 'dash',
     fact: 'About 12 cm long. Blue Tits can lay up to 16 eggs, timed to the arrival of caterpillars.',
   },
   goldfinch: {
     name: 'Goldfinch', latin: 'Carduelis carduelis', status: 'Green',
-    radius: 1.6, mass: 9, colors: { body: 0xc9a27a, belly: 0xf1e6d6, face: 0xd8262a, wing: 0x1b1b1b, bar: 0xf2c200, beak: 0xe8d8c0 },
+    radius: 3.2, mass: 14, colors: { body: 0xc9a27a, belly: 0xf1e6d6, face: 0xd8262a, wing: 0x1b1b1b, bar: 0xf2c200, beak: 0xe8d8c0 },
     power: 'Tap mid-flight: split into a charm of three.', powerKey: 'split',
     fact: 'Very sociable, often breeding in loose groups. Its fine beak reaches seeds in thistles and teasels other birds cannot.',
   },
   thrush: {
     name: 'Song Thrush', latin: 'Turdus philomelos', status: 'Amber',
-    radius: 2.2, mass: 22, colors: { body: 0x8a6a45, belly: 0xf1e4c8, face: 0xf1e4c8, wing: 0x7a5a38, spots: 0x3a2a1a, beak: 0x3a2a1a },
+    radius: 4.5, mass: 35, colors: { body: 0x8a6a45, belly: 0xf1e4c8, face: 0xf1e4c8, wing: 0x7a5a38, spots: 0x3a2a1a, beak: 0x3a2a1a },
     power: 'Tap mid-flight: anvil strike, straight down.', powerKey: 'anvil',
     fact: 'Song Thrushes smash snails open on a favourite stone, called an anvil. Broken shells around a stone give them away.',
   },
   wren: {
     name: 'Wren', latin: 'Troglodytes troglodytes', status: 'Amber',
-    radius: 1.4, mass: 11, colors: { body: 0x8a5a36, belly: 0xc49a6c, face: 0xc49a6c, wing: 0x6a4428, beak: 0x2a1a10 },
+    radius: 2.8, mass: 16, colors: { body: 0x8a5a36, belly: 0xc49a6c, face: 0xc49a6c, wing: 0x6a4428, beak: 0x2a1a10 },
     power: 'Tap mid-flight: sing a shockwave.', powerKey: 'song',
     fact: 'Tiny, with a remarkably loud voice. More than 60 Wrens were once found huddled in a single nest box to keep warm.',
   },
@@ -36,7 +36,7 @@ export const BIRDS = {
 
 export const SQUIRREL = {
   name: 'Grey Squirrel', latin: 'Sciurus carolinensis', status: 'Invasive non-native',
-  radius: 2.2, mass: 8, health: 120,
+  radius: 4.0, mass: 12, health: 200,
   fact: 'Introduced to the UK in the 1800s, grey squirrels have contributed to the decline of the native red squirrel. They are notorious for cracking open bird feeders.',
 };
 
@@ -68,42 +68,42 @@ export const LEVELS = [
     blurb: 'Squirrels have raided a feeder on the Great Ridge, on the way to Mam Tor.',
     tip: 'Drag down from the bird to pull, let go to fling. Set the angle with ▲▼ and follow the dots.',
     birds: ['robin', 'robin', 'robin'],
-    camps: [{ name: 'Great Ridge West', bearing: 250, dist: 35, build: [['hut', 0, 'wood']] }],
+    camps: [{ name: 'Great Ridge West', bearing: 250, dist: 170, build: [['hut', 0, 'wood']] }],
   },
   {
     id: 2, title: 'Back Tor Wall',
     blurb: 'A drystone wall along the ridge towards Back Tor and Lose Hill.',
     tip: 'This camp is behind you. Swivel round: drag the sky or use the arrow keys.',
     birds: ['robin', 'robin', 'robin'],
-    camps: [{ name: 'Back Tor Wall', bearing: 75, dist: 38, build: [['wall', -5, 'stone'], ['tower2', 4, 'wood']] }],
+    camps: [{ name: 'Back Tor Wall', bearing: 75, dist: 200, build: [['wall', -5, 'stone'], ['tower2', 4, 'wood']] }],
   },
   {
     id: 3, title: 'Edale Hedgerow',
     blurb: 'A twiggy camp on the slope above the Vale of Edale.',
     tip: 'Meet the Blue Tit. Tap while it flies to dash forward.',
     birds: ['bluetit', 'bluetit', 'robin'],
-    camps: [{ name: 'Edale Hedgerow', bearing: 300, dist: 42, build: [['hut', -4, 'twig'], ['tower2', 4, 'twig']] }],
+    camps: [{ name: 'Edale Hedgerow', bearing: 300, dist: 200, build: [['hut', -4, 'twig'], ['tower2', 4, 'twig']] }],
   },
   {
     id: 4, title: 'Odin Mine',
     blurb: 'Above the old lead workings under Mam Tor, the Shivering Mountain.',
     tip: 'Meet the Goldfinch. Tap while it flies to split into a charm of three.',
     birds: ['goldfinch', 'goldfinch', 'robin'],
-    camps: [{ name: 'Odin Mine', bearing: 195, dist: 42, build: [['tower1', -7, 'wood'], ['tower2', 0, 'twig'], ['tower1', 7, 'wood']] }],
+    camps: [{ name: 'Odin Mine', bearing: 195, dist: 200, build: [['tower1', -7, 'wood'], ['tower2', 0, 'twig'], ['tower1', 7, 'wood']] }],
   },
   {
     id: 5, title: 'Barber Booth Barn',
     blurb: 'A field barn with a gritstone roof, above the hamlet of Barber Booth.',
     tip: 'Meet the Song Thrush. Tap above the roof to strike straight down, like a snail on an anvil.',
     birds: ['thrush', 'thrush', 'robin'],
-    camps: [{ name: 'Barber Booth Barn', bearing: 270, dist: 45, build: [['barn', 0, 'wood']] }],
+    camps: [{ name: 'Barber Booth Barn', bearing: 270, dist: 240, build: [['barn', 0, 'wood']] }],
   },
   {
     id: 6, title: 'Mam Tor Hill Fort',
     blurb: 'On the flank of Mam Tor, crowned by a Bronze Age and Iron Age hill fort.',
     tip: 'Meet the Wren. Tap near the camp to sing a shockwave.',
     birds: ['wren', 'wren', 'goldfinch'],
-    camps: [{ name: 'Mam Tor Flank', bearing: 225, dist: 52, build: [['tower2', -6, 'twig'], ['tower3', 0, 'twig'], ['hut', 7, 'wood']] }],
+    camps: [{ name: 'Mam Tor Flank', bearing: 225, dist: 280, build: [['tower2', -6, 'twig'], ['tower3', 0, 'twig'], ['hut', 7, 'wood']] }],
   },
   {
     id: 7, title: 'Two Fronts',
@@ -111,8 +111,8 @@ export const LEVELS = [
     tip: 'Follow the red markers on the compass.',
     birds: ['robin', 'bluetit', 'goldfinch', 'thrush'],
     camps: [
-      { name: 'Back Tor Flank', bearing: 90, dist: 45, build: [['tower2', 0, 'wood']] },
-      { name: 'Rushup Side', bearing: 255, dist: 45, build: [['tower2', -4, 'twig'], ['hut', 4, 'wood']] },
+      { name: 'Back Tor Flank', bearing: 90, dist: 240, build: [['tower2', 0, 'wood']] },
+      { name: 'Rushup Side', bearing: 255, dist: 240, build: [['tower2', -4, 'twig'], ['hut', 4, 'wood']] },
     ],
   },
   {
@@ -121,9 +121,9 @@ export const LEVELS = [
     tip: 'Use everything you have. The spyglass helps you pick targets.',
     birds: ['thrush', 'wren', 'goldfinch', 'bluetit', 'robin', 'robin'],
     camps: [
-      { name: 'Lose Hill Path', bearing: 60, dist: 52, build: [['wall', -6, 'stone'], ['tower3', 3, 'twig']] },
-      { name: 'Rushup Barn', bearing: 240, dist: 55, build: [['barn', 0, 'wood']] },
-      { name: 'Edale Lookout', bearing: 15, dist: 42, build: [['tower2', 0, 'wood']] },
+      { name: 'Lose Hill Path', bearing: 60, dist: 280, build: [['wall', -6, 'stone'], ['tower3', 3, 'twig']] },
+      { name: 'Rushup Barn', bearing: 240, dist: 300, build: [['barn', 0, 'wood']] },
+      { name: 'Edale Lookout', bearing: 15, dist: 200, build: [['tower2', 0, 'wood']] },
     ],
   },
 ];
