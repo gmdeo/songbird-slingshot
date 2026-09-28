@@ -51,7 +51,7 @@ export class Game {
     this.settleTimer = 0;
     this.accum = 0;
 
-    world.addEventListener('postStep', () => this._pendingBreaks && this._flushBreaks());
+    // Don't flush breaks during physics step — removing bodies mid-iteration crashes cannon-es.
     this._pendingBreaks = [];
   }
 
@@ -352,6 +352,7 @@ export class Game {
       this.accum -= h; steps++;
     }
     if (steps >= 12) this.accum = 0;
+    this._flushBreaks(); // process breakages AFTER physics loop completes
 
     this.followT += dt;
     this._updateFlight(dt);
