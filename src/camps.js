@@ -8,7 +8,7 @@ import { makeSquirrel } from './models.js';
 // Templates are lists of blocks in camp-local metres: [x, y(base), z, w, h, d, kind]
 // kind: 'post' | 'plank' | 'block' | 'squirrel'. x runs across the line of fire, z away from the player.
 const T = 0.35;
-function frame(x, base, w, h, depth = 2.2) {
+function frame(x, base, w, h, depth = 3.5) {
   const o = w / 2 - T / 2;
   return [
     [x - o, base, -depth / 2 + T / 2, T, h, T, 'post'], [x + o, base, -depth / 2 + T / 2, T, h, T, 'post'],
